@@ -1,13 +1,29 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"strings"
 
+	"github.com/mandala-corps/abreaker/cmd"
 	"github.com/mandala-corps/abreaker/internal/entities"
 	"github.com/spf13/viper"
 )
 
 func main() {
+	ctx := context.Background()
+
+	config := entities.GetConfig()
+	if config.Mode == "" {
+		panic("please set a mode: Server or Agent")
+	}
+
+	switch strings.ToLower(config.Mode) {
+	case "agent":
+		cmd.AgentExecute(ctx, config)
+	default:
+		panic("mode not implemented")
+	}
 
 }
 
