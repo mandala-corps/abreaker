@@ -6,14 +6,14 @@ import (
 	"strings"
 
 	"github.com/mandala-corps/abreaker/cmd"
-	"github.com/mandala-corps/abreaker/internal/entities"
+	"github.com/mandala-corps/abreaker/internal/dto"
 	"github.com/spf13/viper"
 )
 
 func main() {
 	ctx := context.Background()
 
-	config := entities.GetConfig()
+	config := dto.GetConfig()
 	if config.Mode == "" {
 		panic("please set a mode: Server or Agent")
 	}
@@ -38,12 +38,12 @@ func init() {
 		panic(fmt.Errorf("error when readin config file: %v", err))
 	}
 
-	c := &entities.Config{}
+	c := &dto.Config{}
 	// unmarshal config in entite struct
 	err = viper.UnmarshalExact(c)
 	if err != nil {
 		panic(fmt.Errorf("cannot unmarshal configs: %v", err))
 	}
 	// save "global" config
-	entities.SetConfig(c)
+	dto.SetConfig(c)
 }

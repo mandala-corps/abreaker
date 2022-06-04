@@ -1,4 +1,4 @@
-package entities
+package dto
 
 var config *Config
 

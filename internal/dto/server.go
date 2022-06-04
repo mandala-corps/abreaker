@@ -1,4 +1,4 @@
-package entities
+package dto
 
 type Server struct {
 	Addr    string

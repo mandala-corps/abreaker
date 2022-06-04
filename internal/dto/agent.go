@@ -1,4 +1,4 @@
-package entities
+package dto
 
 type Agent struct {
 	// Server will recive request
