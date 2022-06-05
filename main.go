@@ -6,13 +6,17 @@ import (
 	"strings"
 
 	"github.com/mandala-corps/abreaker/cmd"
+	"github.com/mandala-corps/abreaker/internal/dependency"
 	"github.com/mandala-corps/abreaker/internal/dto"
+	"github.com/mandala-corps/abreaker/internal/service"
 	"github.com/spf13/viper"
 )
 
 func main() {
 	ctx := context.Background()
-
+	// inject dependencies
+	ctx = registerDependecies(ctx)
+	// get config
 	config := dto.GetConfig()
 	if config.Mode == "" {
 		panic("please set a mode: Server or Agent")
@@ -46,4 +50,17 @@ func init() {
 	}
 	// save "global" config
 	dto.SetConfig(c)
+}
+
+func registerDependecies(ctx context.Context) context.Context {
+	d := make(map[dependency.Key]interface{})
+
+	d[dependency.ConfigKey] = dto.GetConfig()
+	d[dependency.ServerServiceKey] = service.NewServerService()
+
+	for k, v := range d {
+		ctx = context.WithValue(ctx, k, v)
+	}
+
+	return ctx
 }
