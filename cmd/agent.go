@@ -2,13 +2,16 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/mandala-corps/abreaker/internal/dependency"
 	"github.com/mandala-corps/abreaker/internal/dto"
+	"github.com/mandala-corps/abreaker/internal/service"
 )
 
 func AgentExecute(ctx context.Context, config *dto.Config) {
@@ -34,6 +37,7 @@ func coroutineWatch(ctx context.Context, wg *sync.WaitGroup, w *dto.Watcher, n s
 	case "http":
 		// do request http
 		rs := makeHttpRequest(ctx, w, n)
+		// TODO check if returns error
 		syncServer(ctx, rs)
 	default:
 		fmt.Printf("Method %s not implemented\n", w.Method)
@@ -64,6 +68,13 @@ func makeHttpRequest(ctx context.Context, w *dto.Watcher, name string) *dto.Resu
 	return rs
 }
 
-func syncServer(ctx context.Context, rs *dto.Result) {
+func syncServer(ctx context.Context, rs *dto.Result) error {
 	log.Printf("Request for %s replied in %d ms", rs.Name, rs.Duration)
+
+	s, ok := ctx.Value(dependency.ServerServiceKey).(service.ServerSyncService)
+	if !ok {
+		return errors.New("server service not return ServerSyncService")
+	}
+
+	return s.SendResult(ctx, rs)
 }
