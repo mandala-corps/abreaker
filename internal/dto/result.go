@@ -5,4 +5,6 @@ type Result struct {
 	Duration int
 	// if has error in request
 	Err error
+	// watcher name
+	Name string
 }

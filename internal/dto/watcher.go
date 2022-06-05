@@ -1,7 +1,6 @@
 package dto
 
 type Watcher struct {
-	Addr   string
-	Name   string
-	Method string
+	Addr   string `mapstructure:"addr"`
+	Method string `mapstructure:"method"`
 }

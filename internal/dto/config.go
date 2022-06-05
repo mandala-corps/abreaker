@@ -3,7 +3,7 @@ package dto
 var config *Config
 
 type Config struct {
-	Mode  string `mapstructure:"interval"`
+	Mode  string `mapstructure:"mode"`
 	Agent *Agent `mapstructure:"agent"`
 }
 

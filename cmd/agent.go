@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -15,9 +16,9 @@ func AgentExecute(ctx context.Context, config *dto.Config) {
 	for {
 		var wg sync.WaitGroup
 		// watcher all aims
-		for _, w := range config.Agent.Watchers {
+		for n, w := range config.Agent.Watchers {
 			wg.Add(1)
-			go coroutineWatch(ctx, &wg, w)
+			go coroutineWatch(ctx, &wg, w, n)
 		}
 		// wait for all coroutines done
 		wg.Wait()
@@ -26,13 +27,13 @@ func AgentExecute(ctx context.Context, config *dto.Config) {
 	}
 }
 
-func coroutineWatch(ctx context.Context, wg *sync.WaitGroup, w *dto.Watcher) {
+func coroutineWatch(ctx context.Context, wg *sync.WaitGroup, w *dto.Watcher, n string) {
 	defer wg.Done()
 	// make request
 	switch w.Method {
 	case "http":
 		// do request http
-		rs := makeHttpRequest(ctx, w)
+		rs := makeHttpRequest(ctx, w, n)
 		syncServer(ctx, rs)
 	default:
 		fmt.Printf("Method %s not implemented\n", w.Method)
@@ -40,8 +41,10 @@ func coroutineWatch(ctx context.Context, wg *sync.WaitGroup, w *dto.Watcher) {
 
 }
 
-func makeHttpRequest(ctx context.Context, w *dto.Watcher) *dto.Result {
-	rs := &dto.Result{}
+func makeHttpRequest(ctx context.Context, w *dto.Watcher, name string) *dto.Result {
+	rs := &dto.Result{
+		Name: name,
+	}
 	// make get request
 	startAt := time.Now()
 	resp, err := http.Get(w.Addr)
@@ -56,11 +59,11 @@ func makeHttpRequest(ctx context.Context, w *dto.Watcher) *dto.Result {
 		rs.Err = fmt.Errorf("response dont return with successful status code: returns %d", resp.StatusCode)
 	}
 
-	rs.Duration = int(endAt.Sub(startAt).Microseconds())
+	rs.Duration = int(endAt.Sub(startAt).Milliseconds())
 
 	return rs
 }
 
 func syncServer(ctx context.Context, rs *dto.Result) {
-	fmt.Print(rs)
+	log.Printf("Request for %s replied in %d ms", rs.Name, rs.Duration)
 }
