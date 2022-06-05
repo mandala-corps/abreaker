@@ -25,6 +25,8 @@ func main() {
 	switch strings.ToLower(config.Mode) {
 	case "agent":
 		cmd.AgentExecute(ctx, config)
+	case "server":
+		cmd.ExecuteServer(ctx, config)
 	default:
 		panic("mode not implemented")
 	}

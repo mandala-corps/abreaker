@@ -15,8 +15,10 @@ func ExecuteServer(ctx context.Context, cfg *dto.Config) {
 	router := httprouter.New()
 
 	router.POST("/recive", handle.Recive)
+	router.GET("/", handle.Alive)
 
 	addr := fmt.Sprintf("%s:%s", cfg.Server.Addr, cfg.Server.Port)
 
+	log.Printf("Server starting at %s", addr)
 	log.Fatal(http.ListenAndServe(addr, router))
 }
