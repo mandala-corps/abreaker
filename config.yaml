@@ -1,0 +1,7 @@
+mode: "agent"
+agent:
+  interval: 5 #5 segundos cada request
+  watchers:
+    teste:
+      addr: "http://dev.madeiramadeira.com.br:60013/supplier/alive"
+      method: "http"  
