@@ -14,19 +14,19 @@ import (
 	"github.com/mandala-corps/abreaker/internal/service"
 )
 
-func AgentExecute(ctx context.Context, config *dto.Config) {
+func AgentExecute(ctx context.Context, cfg *dto.Config) {
 	// TODO add defer function for recover panic
 	for {
 		var wg sync.WaitGroup
 		// watcher all aims
-		for n, w := range config.Agent.Watchers {
+		for n, w := range cfg.Agent.Watchers {
 			wg.Add(1)
 			go coroutineWatch(ctx, &wg, w, n)
 		}
 		// wait for all coroutines done
 		wg.Wait()
 		// wait for next request
-		time.Sleep(time.Duration(config.Agent.Interval) * time.Second)
+		time.Sleep(time.Duration(cfg.Agent.Interval) * time.Second)
 	}
 }
 
